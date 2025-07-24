@@ -1,5 +1,3 @@
-import { Request, Response } from 'express';
-
 import { getTestStatus, startTestBot, stopTestBot } from './bots/test';
 
 // Bot and controller types
@@ -11,28 +9,29 @@ interface Bot {
 
 interface BotController {
   start: () => Promise<void>;
-  stop: () => void;
+  stop: () => Promise<void>;
   status: () => boolean;
 }
 
 const botControllerMap: Record<string, BotController> = {
-  test_bot: {
+  bot_test: {
     start: startTestBot,
-    stop: stopTestBot,
+    stop: async () => stopTestBot(), // Wrapped in async
     status: getTestStatus,
   },
+  // Add other bots here as needed
 };
 
 const bots: Bot[] = [
-  { id: 'sportybet_football', name: 'sportybet_football', status: false },
   { id: 'bot_test', name: 'bot_test', status: false },
+  // Add other bots here as needed
 ];
 
 let engineStatus = false;
 
 const findBotById = (id: string) => bots.find(bot => bot.id === id);
 
-export const startEngine = async (res: Response) => {
+export const startEngine = async (req: any, res: any) => {
   if (engineStatus) {
     return res.status(200).json({
       success: false,
@@ -51,12 +50,11 @@ export const startEngine = async (res: Response) => {
   return res.status(200).json({
     success: true,
     status: 'ENGINE_STARTED',
-    message: 'Engine has started and all bots are running.',
-    bots,
+    message: 'Engine has started and all bots are running.'
   });
 };
 
-export const stopEngine = async (res: Response) => {
+export const stopEngine = async (req: any, res: any) => {
   if (!engineStatus) {
     return res.status(200).json({
       success: false,
@@ -80,7 +78,8 @@ export const stopEngine = async (res: Response) => {
   });
 };
 
-export const startBotById = async (req: Request, res: Response) => {
+
+export const startBotById = async (req: any, res: any) => {
   const { id } = req.body;
   if (!engineStatus) {
     return res.status(400).json({
@@ -108,7 +107,7 @@ export const startBotById = async (req: Request, res: Response) => {
   });
 };
 
-export const stopBotById = async (req: Request, res: Response) => {
+export const stopBotById = async (req: any, res: any) => {
   const { id } = req.body;
   if (!engineStatus) {
     return res.status(400).json({
@@ -136,25 +135,22 @@ export const stopBotById = async (req: Request, res: Response) => {
   });
 };
 
-export const getAllBot = async ( res: Response) => {
-  
+export const getAllBot = async (req: any, res: any) => {
   if (!engineStatus) {
     return res.status(400).json({
       success: false,
       status: 'ENGINE_NOT_RUNNING',
-      message: 'Engine must be running to start a bot.',
+      message: 'Engine must be running to get bot list.',
     });
   }
-
- 
   return res.status(200).json({
     success: true,
-    message: `Bot list fetched has been started.`,
+    message: `Bot list fetched successfully.`,
     data: bots,
   });
 };
 
-export const getStatusById = (req: Request, res: Response) => {
+export const getStatusById = async (req: any, res: any) => {
   const { id } = req.body;
   const bot = findBotById(id);
   if (!bot) {
@@ -168,54 +164,5 @@ export const getStatusById = (req: Request, res: Response) => {
     success: true,
     message: `Bot ${bot.name} is ${bot.status ? 'running' : 'not running'}.`,
     data: bot,
-  });
-};
-
-export const runBetBuilder = (req: Request, res: Response) => {
-  const { type } = req.body;
-  if (!engineStatus) {
-    return res.status(400).json({
-      success: false,
-      message: 'Engine is not running.',
-    });
-  }
-  // TODO: Implement bet builder logic
-  console.log(`Bet builder type: ${type}`);
-  return res.status(200).json({
-    success: true,
-    message: 'Bet slip generated.',
-  });
-};
-
-export const postPrediction = (req: Request, res: Response) => {
-  const { data } = req.body;
-  if (!engineStatus) {
-    return res.status(400).json({
-      success: false,
-      message: 'Engine is not running.',
-    });
-  }
-  // TODO: Implement prediction logic
-  console.log('Received prediction:', data);
-  return res.status(200).json({
-    success: true,
-    message: 'Prediction received.',
-  });
-};
-
-export const getPredictionById = (req: Request, res: Response) => {
-  const { id } = req.body;
-  if (!engineStatus) {
-    return res.status(400).json({
-      success: false,
-      message: 'Engine is not running.',
-    });
-  }
-  // TODO: Fetch prediction by ID
-  console.log(`Fetching prediction for bot: ${id}`);
-  return res.status(200).json({
-    success: true,
-    message: 'Prediction fetched.',
-    data: { id }, // Replace with real prediction data
   });
 };
