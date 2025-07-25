@@ -19,10 +19,6 @@ app.post('/stop', controller_1.stopEngine);
 app.get('/all', controller_1.getAllBot);
 app.get('/start/id', controller_1.startBotById);
 app.get('/stop/id', controller_1.stopBotById);
-app.post('/getStatus/id', controller_1.getStatusById);
-app.post('/betBuilder', controller_1.runBetBuilder);
-app.post('/prediction', controller_1.postPrediction);
-app.get('/prediction/id', controller_1.getPredictionById);
 // Start server
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {

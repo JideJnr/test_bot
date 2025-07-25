@@ -1,6 +1,5 @@
 import { getTestStatus, startTestBot, stopTestBot } from './bots/test';
 
-// Bot and controller types
 interface Bot {
   id: string;
   name: keyof typeof botControllerMap;
@@ -19,12 +18,11 @@ const botControllerMap: Record<string, BotController> = {
     stop: async () => stopTestBot(), // Wrapped in async
     status: getTestStatus,
   },
-  // Add other bots here as needed
+
 };
 
 const bots: Bot[] = [
-  { id: 'bot_test', name: 'bot_test', status: false },
-  // Add other bots here as needed
+  { id: 'bot_test', name: 'bot_test', status: false }
 ];
 
 let engineStatus = false;
@@ -77,7 +75,6 @@ export const stopEngine = async (req: any, res: any) => {
     bots,
   });
 };
-
 
 export const startBotById = async (req: any, res: any) => {
   const { id } = req.body;

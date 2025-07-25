@@ -9,22 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPredictionById = exports.postPrediction = exports.runBetBuilder = exports.getStatusById = exports.getAllBot = exports.stopBotById = exports.startBotById = exports.stopEngine = exports.startEngine = void 0;
+exports.getStatusById = exports.getAllBot = exports.stopBotById = exports.startBotById = exports.stopEngine = exports.startEngine = void 0;
 const test_1 = require("./bots/test");
 const botControllerMap = {
-    test_bot: {
+    bot_test: {
         start: test_1.startTestBot,
-        stop: test_1.stopTestBot,
+        stop: () => __awaiter(void 0, void 0, void 0, function* () { return (0, test_1.stopTestBot)(); }), // Wrapped in async
         status: test_1.getTestStatus,
     },
+    // Add other bots here as needed
 };
 const bots = [
-    { id: 'sportybet_football', name: 'sportybet_football', status: false },
     { id: 'bot_test', name: 'bot_test', status: false },
+    // Add other bots here as needed
 ];
 let engineStatus = false;
 const findBotById = (id) => bots.find(bot => bot.id === id);
-const startEngine = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const startEngine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (engineStatus) {
         return res.status(200).json({
             success: false,
@@ -43,12 +44,11 @@ const startEngine = (res) => __awaiter(void 0, void 0, void 0, function* () {
     return res.status(200).json({
         success: true,
         status: 'ENGINE_STARTED',
-        message: 'Engine has started and all bots are running.',
-        bots,
+        message: 'Engine has started and all bots are running.'
     });
 });
 exports.startEngine = startEngine;
-const stopEngine = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const stopEngine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!engineStatus) {
         return res.status(200).json({
             success: false,
@@ -128,22 +128,22 @@ const stopBotById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
 });
 exports.stopBotById = stopBotById;
-const getAllBot = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllBot = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!engineStatus) {
         return res.status(400).json({
             success: false,
             status: 'ENGINE_NOT_RUNNING',
-            message: 'Engine must be running to start a bot.',
+            message: 'Engine must be running to get bot list.',
         });
     }
     return res.status(200).json({
         success: true,
-        message: `Bot list fetched has been started.`,
+        message: `Bot list fetched successfully.`,
         data: bots,
     });
 });
 exports.getAllBot = getAllBot;
-const getStatusById = (req, res) => {
+const getStatusById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.body;
     const bot = findBotById(id);
     if (!bot) {
@@ -158,54 +158,5 @@ const getStatusById = (req, res) => {
         message: `Bot ${bot.name} is ${bot.status ? 'running' : 'not running'}.`,
         data: bot,
     });
-};
+});
 exports.getStatusById = getStatusById;
-const runBetBuilder = (req, res) => {
-    const { type } = req.body;
-    if (!engineStatus) {
-        return res.status(400).json({
-            success: false,
-            message: 'Engine is not running.',
-        });
-    }
-    // TODO: Implement bet builder logic
-    console.log(`Bet builder type: ${type}`);
-    return res.status(200).json({
-        success: true,
-        message: 'Bet slip generated.',
-    });
-};
-exports.runBetBuilder = runBetBuilder;
-const postPrediction = (req, res) => {
-    const { data } = req.body;
-    if (!engineStatus) {
-        return res.status(400).json({
-            success: false,
-            message: 'Engine is not running.',
-        });
-    }
-    // TODO: Implement prediction logic
-    console.log('Received prediction:', data);
-    return res.status(200).json({
-        success: true,
-        message: 'Prediction received.',
-    });
-};
-exports.postPrediction = postPrediction;
-const getPredictionById = (req, res) => {
-    const { id } = req.body;
-    if (!engineStatus) {
-        return res.status(400).json({
-            success: false,
-            message: 'Engine is not running.',
-        });
-    }
-    // TODO: Fetch prediction by ID
-    console.log(`Fetching prediction for bot: ${id}`);
-    return res.status(200).json({
-        success: true,
-        message: 'Prediction fetched.',
-        data: { id }, // Replace with real prediction data
-    });
-};
-exports.getPredictionById = getPredictionById;
