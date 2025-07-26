@@ -21,7 +21,9 @@ const botControllerMap: Record<string, BotController> = {
 };
 
 const bots: Bot[] = [
-  { id: 'bot_test', name: 'bot_test', status: false }
+  { id: 'bot_test', name: 'bot_test', status: false },
+  { id: 'a_test', name: 'b_test', status: false },
+  { id: 'bot_t', name: 'bot_t', status: false }
 ];
 
 let engineStatus = false;
@@ -47,7 +49,8 @@ export const startEngine = async (req: any, res: any) => {
   return res.status(200).json({
     success: true,
     status: 'ENGINE_STARTED',
-    message: 'Engine has started and all bots are running.'
+    message: 'Engine has started and all bots are running.',
+    bots,
   });
 };
 
@@ -80,10 +83,9 @@ export const getEngineStatus = async (req: any, res: any) => {
     success: true,
     status: engineStatus ? 'ENGINE_RUNNING' : 'ENGINE_STOPPED',
     message: engineStatus ? 'Engine is running.' : 'Engine is stopped.',
+    bots
   });
 };
-
-
 
 export const getAllBot = async (req: any, res: any) => {
   if (!engineStatus) {
