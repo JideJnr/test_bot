@@ -17,11 +17,9 @@ const botControllerMap = {
         stop: () => __awaiter(void 0, void 0, void 0, function* () { return (0, test_1.stopTestBot)(); }), // Wrapped in async
         status: test_1.getTestStatus,
     },
-    // Add other bots here as needed
 };
 const bots = [
-    { id: 'bot_test', name: 'bot_test', status: false },
-    // Add other bots here as needed
+    { id: 'bot_test', name: 'bot_test', status: false }
 ];
 let engineStatus = false;
 const findBotById = (id) => bots.find(bot => bot.id === id);

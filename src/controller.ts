@@ -15,10 +15,9 @@ interface BotController {
 const botControllerMap: Record<string, BotController> = {
   bot_test: {
     start: startTestBot,
-    stop: async () => stopTestBot(), // Wrapped in async
+    stop: async () => stopTestBot(), 
     status: getTestStatus,
   },
-
 };
 
 const bots: Bot[] = [
@@ -73,6 +72,31 @@ export const stopEngine = async (req: any, res: any) => {
     status: 'ENGINE_STOPPED',
     message: 'Engine has stopped and all bots are shut down.',
     bots,
+  });
+};
+
+export const getEngineStatus = async (req: any, res: any) => {
+  return res.status(200).json({
+    success: true,
+    status: engineStatus ? 'ENGINE_RUNNING' : 'ENGINE_STOPPED',
+    message: engineStatus ? 'Engine is running.' : 'Engine is stopped.',
+  });
+};
+
+
+
+export const getAllBot = async (req: any, res: any) => {
+  if (!engineStatus) {
+    return res.status(400).json({
+      success: false,
+      status: 'ENGINE_NOT_RUNNING',
+      message: 'Engine must be running to get bot list.',
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    message: `Bot list fetched successfully.`,
+    data: bots,
   });
 };
 
@@ -132,22 +156,7 @@ export const stopBotById = async (req: any, res: any) => {
   });
 };
 
-export const getAllBot = async (req: any, res: any) => {
-  if (!engineStatus) {
-    return res.status(400).json({
-      success: false,
-      status: 'ENGINE_NOT_RUNNING',
-      message: 'Engine must be running to get bot list.',
-    });
-  }
-  return res.status(200).json({
-    success: true,
-    message: `Bot list fetched successfully.`,
-    data: bots,
-  });
-};
-
-export const getStatusById = async (req: any, res: any) => {
+export const getBotById = async (req: any, res: any) => {
   const { id } = req.body;
   const bot = findBotById(id);
   if (!bot) {
